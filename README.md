@@ -1,84 +1,71 @@
-# Turborepo starter
+# URL Shortener Microservice
 
-This Turborepo starter is maintained by the Turborepo core team.
+This is a scalable URL shortener service built with a microservices architecture. The main API is developed using [NestJS](https://nestjs.com/) and communicates with other services through an API Gateway powered by [KrakenD](https://www.krakend.io/). The system supports authentication, click tracking, URL registration, and multi-tenant usage.
 
-## Using this example
+## Features
 
-Run the following command:
+- 🔗 Shorten and expand URLs
+- 📊 Click tracking per shortened URL
+- 🧾 URL registration history per user
+- 🔐 Secure authentication (JWT-based)
+- 🧰 Microservices structure with Docker
+- 🌍 API Gateway using KrakenD
+- 🧪 Ready for production with CI-friendly architecture
+- 🧭 Multi-tenant support
+- 📁 Monorepo-friendly layout
 
-```sh
-npx create-turbo@latest
+
+## Technologies
+
+- **NestJS** - Main API framework
+- **Prisma ORM** - Database access
+- **PostgreSQL** - Main database
+- **KrakenD** - API Gateway
+- **Docker** - Containerization for all services
+- **TypeScript** - All services written in TypeScript
+
+## Getting Started
+
+### Prerequisites
+
+- Docker and Docker Compose
+- Node.js (v18+)
+- pnpm
+
+### Installation
+
+```bash
+git clone https://github.com/your-org/url-shortener.git
+cd url-shortener
+pnpm install
 ```
 
-## What's inside?
-
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-pnpm build
+### Running the Project
+```bash
+# Start all services
+docker-compose up --build
 ```
 
-### Develop
+### Testing the Gateway
+Once up, you can make requests to the API via the KrakenD gateway:
 
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-pnpm dev
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-npx turbo login
+```bash
+curl -X POST http://localhost:8080/url \
+  -H "Authorization: Bearer <your_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"originalUrl": "https://example.com"}'
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
+### Project Structure
+```bash
+/apps
+  /gateway        --> KrakenD configuration
+  /api            --> NestJS main API
+  /url-service    --> Microservice for URL shortening
+/libs
+  /common         --> Shared DTOs, interfaces, etc.
+/prisma
+  schema.prisma   --> Database schema
+/docker
+  docker-compose.yaml
 ```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)

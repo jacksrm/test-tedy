@@ -3,7 +3,7 @@
   "version": 3,
   "name": "url-shortener-gateway",
   "port": 8080,
-  "timeout": "3000ms",
+  "timeout": "30000ms",
   "endpoints": [
     {
       "endpoint": "/shorten",
@@ -82,6 +82,7 @@
     },
     {
       "endpoint": "/{shortCode}",
+      "output_encoding": "no-op",
       "method": "GET",
       "backend": [
         {
@@ -89,7 +90,12 @@
             "http://url-service:3000"
           ],
           "url_pattern": "/{shortCode}",
-          "method": "GET"
+          "encoding": "no-op",
+          "extra_config": {
+            "backend/http/client": {
+              "no_redirect": true
+            }
+          }
         }
       ]
     }

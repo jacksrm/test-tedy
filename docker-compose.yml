@@ -25,3 +25,11 @@ services:
       - ./apps/url-service/.env
     depends_on:
       - db
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/url_shortener
+    entrypoint:
+      [
+        'sh',
+        '-c',
+        'corepack enable && npx pnpm prisma migrate deploy && node dist/main',
+      ]

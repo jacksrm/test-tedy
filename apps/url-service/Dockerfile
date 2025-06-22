@@ -9,7 +9,6 @@ COPY . .
 
 RUN corepack enable && pnpm install
 RUN pnpm prisma generate
-RUN pnpm prisma migrate deploy
 RUN pnpm build
 
 # Etapa 2: runtime
@@ -20,5 +19,6 @@ WORKDIR /app
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/prisma ./prisma
 
 CMD ["node", "dist/main"]
