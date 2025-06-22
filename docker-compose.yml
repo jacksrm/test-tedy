@@ -1,0 +1,27 @@
+services:
+  krakend:
+    image: devopsfaith/krakend:2.4
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./docker/krakend:/etc/krakend
+    command: ['run', '-d', '-c', '/etc/krakend/krakend.json']
+
+  db:
+    image: postgres:16
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_DB: url_shortener
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+  url-service:
+    build:
+      context: ./apps/url-service
+    ports:
+      - '3000:3000'
+    env_file:
+      - ./apps/url-service/.env
+    depends_on:
+      - db

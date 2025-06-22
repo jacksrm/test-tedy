@@ -1,0 +1,97 @@
+{
+  "$schema": "https://www.krakend.io/schema/v3.json",
+  "version": 3,
+  "name": "url-shortener-gateway",
+  "port": 8080,
+  "timeout": "3000ms",
+  "endpoints": [
+    {
+      "endpoint": "/shorten",
+      "method": "POST",
+      "backend": [
+        {
+          "host": [
+            "http://url-service:3000"
+          ],
+          "url_pattern": "/shorten",
+          "method": "POST",
+          "extra_config": {
+            "github.com/devopsfaith/krakend/proxy": {
+              "response_codes": {
+                "default": 200,
+                "100": 100,
+                "101": 101,
+                "200": 200,
+                "201": 201,
+                "204": 204,
+                "301": 301,
+                "302": 302,
+                "400": 400,
+                "401": 401,
+                "403": 403,
+                "404": 404,
+                "409": 409,
+                "422": 422,
+                "500": 500,
+                "502": 502,
+                "503": 503
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/me/urls",
+      "method": "GET",
+      "backend": [
+        {
+          "host": [
+            "http://url-service:3000"
+          ],
+          "url_pattern": "/me/urls",
+          "method": "GET"
+        }
+      ]
+    },
+    {
+      "endpoint": "/me/urls/{id}",
+      "method": "PATCH",
+      "backend": [
+        {
+          "host": [
+            "http://url-service:3000"
+          ],
+          "url_pattern": "/me/urls/{id}",
+          "method": "PATCH"
+        }
+      ]
+    },
+    {
+      "endpoint": "/me/urls/{id}",
+      "method": "DELETE",
+      "backend": [
+        {
+          "host": [
+            "http://url-service:3000"
+          ],
+          "url_pattern": "/me/urls/{id}",
+          "method": "DELETE"
+        }
+      ]
+    },
+    {
+      "endpoint": "/{shortCode}",
+      "method": "GET",
+      "backend": [
+        {
+          "host": [
+            "http://url-service:3000"
+          ],
+          "url_pattern": "/{shortCode}",
+          "method": "GET"
+        }
+      ]
+    }
+  ]
+}
