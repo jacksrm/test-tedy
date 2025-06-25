@@ -9,7 +9,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './repository/user.repository';
 import { User } from './entities/user.entity';
 import { v4 } from 'uuid';
-import * as bcrypt from 'bcrypt';
 import { ErrorMessages } from '../error/messages';
 import { UserResponseDto } from './dto/user-response.dto';
 import { ListUsersOptionsDto } from './dto/list-users-options.dto';
@@ -141,7 +140,7 @@ export class UserService {
     }
 
     if (!result || result.deletedAt)
-      throw new NotFoundException(ErrorMessages.USER_NOT_FOUND);
+      throw new NotFoundException(ErrorMessages.USER_NOT_FOUND_2);
 
     return result;
   }

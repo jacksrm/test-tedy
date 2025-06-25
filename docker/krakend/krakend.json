@@ -4,6 +4,14 @@
   "name": "url-shortener-gateway",
   "port": 8080,
   "timeout": "30000ms",
+  "extra_config": {
+    "telemetry/logging": {
+      "level": "INFO",
+      "prefix": "[KRAKEND]",
+      "syslog": false,
+      "stdout": true
+    }
+  },
   "endpoints": [
     {
       "endpoint": "/auth/login",
@@ -16,9 +24,157 @@
           "url_pattern": "/auth/login",
           "method": "POST"
         }
+      ],
+      "extra_config": {
+        "auth/signer": {
+          "alg": "HS256",
+          "jwk_local_path": "/etc/krakend/secrets/jwk.json",
+          "disable_jwk_security": true,
+          "kid": "url-shortener-jwt-key",
+          "keys_to_sign": [
+            "accessToken"
+          ]
+        }
+      }
+    },
+    {
+      "output_encoding": "no-op",
+      "endpoint": "/users",
+      "method": "POST",
+      "backend": [
+        {
+          "host": [
+            "http://auth-service:3001"
+          ],
+          "url_pattern": "/users",
+          "method": "POST"
+        }
       ]
     },
     {
+      "output_encoding": "no-op",
+      "endpoint": "/users",
+      "method": "GET",
+      "backend": [
+        {
+          "host": [
+            "http://auth-service:3001"
+          ],
+          "url_pattern": "/users",
+          "method": "GET"
+        }
+      ]
+    },
+    {
+      "output_encoding": "no-op",
+      "endpoint": "/users/me",
+      "method": "GET",
+      "extra_config": {
+        "auth/validator": {
+          "alg": "HS256",
+          "jwk_local_path": "/etc/krakend/secrets/jwk.json",
+          "disable_jwk_security": true,
+          "propagate_claims": [
+            [
+              "id",
+              "x-id"
+            ]
+          ]
+        }
+      },
+      "backend": [
+        {
+          "host": [
+            "http://auth-service:3001"
+          ],
+          "url_pattern": "/users/me",
+          "method": "GET"
+        }
+      ]
+    },
+    {
+      "output_encoding": "no-op",
+      "endpoint": "/users/me",
+      "method": "PATCH",
+      "extra_config": {
+        "auth/validator": {
+          "alg": "HS256",
+          "jwk_local_path": "/etc/krakend/secrets/jwk.json",
+          "disable_jwk_security": true,
+          "propagate_claims": [
+            [
+              "id",
+              "x-id"
+            ]
+          ]
+        }
+      },
+      "backend": [
+        {
+          "host": [
+            "http://auth-service:3001"
+          ],
+          "url_pattern": "/users/me",
+          "method": "PATCH"
+        }
+      ]
+    },
+    {
+      "output_encoding": "no-op",
+      "endpoint": "/users/me",
+      "method": "DELETE",
+      "extra_config": {
+        "auth/validator": {
+          "alg": "HS256",
+          "jwk_local_path": "/etc/krakend/secrets/jwk.json",
+          "disable_jwk_security": true,
+          "propagate_claims": [
+            [
+              "id",
+              "x-id"
+            ]
+          ]
+        }
+      },
+      "backend": [
+        {
+          "host": [
+            "http://auth-service:3001"
+          ],
+          "url_pattern": "/users/me",
+          "method": "DELETE"
+        }
+      ]
+    },
+    {
+      "output_encoding": "no-op",
+      "endpoint": "/shorten/auth",
+      "method": "POST",
+      "extra_config": {
+        "auth/validator": {
+          "alg": "HS256",
+          "jwk_local_path": "/etc/krakend/secrets/jwk.json",
+          "disable_jwk_security": true,
+          "propagate_claims": [
+            [
+              "id",
+              "x-id"
+            ]
+          ]
+        }
+      },
+      "backend": [
+        {
+          "host": [
+            "http://url-service:3000"
+          ],
+          "url_pattern": "/shorten",
+          "method": "POST"
+        }
+      ]
+    },
+    {
+      "output_encoding": "no-op",
       "endpoint": "/shorten",
       "method": "POST",
       "backend": [
@@ -27,47 +183,24 @@
             "http://url-service:3000"
           ],
           "url_pattern": "/shorten",
-          "method": "POST",
-          "extra_config": {
-            "github.com/devopsfaith/krakend/proxy": {
-              "response_codes": {
-                "default": 200,
-                "100": 100,
-                "101": 101,
-                "200": 200,
-                "201": 201,
-                "204": 204,
-                "301": 301,
-                "302": 302,
-                "400": 400,
-                "401": 401,
-                "403": 403,
-                "404": 404,
-                "409": 409,
-                "422": 422,
-                "500": 500,
-                "502": 502,
-                "503": 503
-              }
-            }
-          }
+          "method": "POST"
         }
       ]
     },
     {
+      "output_encoding": "no-op",
       "endpoint": "/me/urls",
       "method": "GET",
       "extra_config": {
         "auth/validator": {
           "alg": "HS256",
-          "secret": "default-secret",
+          "jwk_local_path": "/etc/krakend/secrets/jwk.json",
           "disable_jwk_security": true,
-          "propagate_claims": true,
-          "headers": [
-            {
-              "name": "x-user-id",
-              "value": "{claim:id}"
-            }
+          "propagate_claims": [
+            [
+              "id",
+              "x-id"
+            ]
           ]
         }
       },
@@ -82,8 +215,22 @@
       ]
     },
     {
+      "output_encoding": "no-op",
       "endpoint": "/me/urls/{id}",
       "method": "PATCH",
+      "extra_config": {
+        "auth/validator": {
+          "alg": "HS256",
+          "jwk_local_path": "/etc/krakend/secrets/jwk.json",
+          "disable_jwk_security": true,
+          "propagate_claims": [
+            [
+              "id",
+              "x-id"
+            ]
+          ]
+        }
+      },
       "backend": [
         {
           "host": [
@@ -95,8 +242,22 @@
       ]
     },
     {
+      "output_encoding": "no-op",
       "endpoint": "/me/urls/{id}",
       "method": "DELETE",
+      "extra_config": {
+        "auth/validator": {
+          "alg": "HS256",
+          "jwk_local_path": "/etc/krakend/secrets/jwk.json",
+          "disable_jwk_security": true,
+          "propagate_claims": [
+            [
+              "id",
+              "x-id"
+            ]
+          ]
+        }
+      },
       "backend": [
         {
           "host": [
@@ -108,8 +269,8 @@
       ]
     },
     {
-      "endpoint": "/{shortCode}",
       "output_encoding": "no-op",
+      "endpoint": "/{shortCode}",
       "method": "GET",
       "backend": [
         {

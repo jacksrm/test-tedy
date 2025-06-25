@@ -4,7 +4,6 @@ import {
   Post,
   Body,
   Patch,
-  Param,
   Delete,
   Query,
   Headers,
@@ -36,7 +35,7 @@ export class UserController {
   }
 
   @Get('me')
-  async findOne(@Headers('x-user-id') id: string): Promise<UserResponseDto> {
+  async findOne(@Headers('x-id') id: string): Promise<UserResponseDto> {
     if (!id) throw new UnauthorizedException(ErrorMessages.UNAUTHORIZED_USER);
 
     const result = await this.userService.findOne(id);
@@ -45,7 +44,7 @@ export class UserController {
 
   @Patch('me')
   async update(
-    @Headers('x-user-id') id: string,
+    @Headers('x-id') id: string,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<UserResponseDto> {
     if (!id) throw new UnauthorizedException(ErrorMessages.UNAUTHORIZED_USER);
@@ -56,7 +55,7 @@ export class UserController {
   }
 
   @Delete('me')
-  async remove(@Headers('x-user-id') id: string): Promise<UserResponseDto> {
+  async remove(@Headers('x-id') id: string): Promise<UserResponseDto> {
     if (!id) throw new UnauthorizedException(ErrorMessages.UNAUTHORIZED_USER);
 
     const result = await this.userService.remove(id);

@@ -4,6 +4,8 @@ import { UserService } from '../user/user.service'; // or PrismaService
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { ErrorMessages } from 'src/error/messages';
+import { VerifyTokenResponseDto } from './dto/veryfy-token-response.dto';
+import { AuthResponseDto } from './dto/auth-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -12,8 +14,10 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async validateUserAndGenerateToken(loginDto: LoginDto): Promise<string> {
+  async validateUserAndGenerateToken(loginDto: LoginDto) {
     const user = await this.userService.findByEmail(loginDto.email);
+
+    if (!user) throw new BadRequestException(ErrorMessages.INVALID_CREDENTIALS);
 
     const isPasswordValid = await bcrypt.compare(
       loginDto.password,
@@ -29,6 +33,24 @@ export class AuthService {
       name: user.name,
     };
 
-    return this.jwtService.signAsync(payload);
+    // return this.jwtService.signAsync(payload, {
+    //   secret: process.env.JWT_SECRET,
+    //   expiresIn: '1h',
+    //   keyid: 'url-shortener-jwt-key',
+    // });
+
+    return payload;
+  }
+
+  async verifyToken(token: string): Promise<VerifyTokenResponseDto> {
+    const payload = await this.jwtService.verifyAsync<{
+      id: string;
+      email: string;
+      name: string;
+    }>(token, {
+      secret: process.env.JWT_SECRET,
+    });
+
+    return new VerifyTokenResponseDto({ id: payload.id, email: payload.email });
   }
 }

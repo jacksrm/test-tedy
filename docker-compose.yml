@@ -1,11 +1,21 @@
 services:
   krakend:
-    image: devopsfaith/krakend-ce:2.4
+    image: krakend:latest
     ports:
       - '8080:8080'
     volumes:
       - ./docker/krakend:/etc/krakend
     command: ['run', '-d', '-c', '/etc/krakend/krakend.json']
+
+  docs:
+    image: swaggerapi/swagger-ui
+    ports:
+      - '8081:8080'
+    volumes:
+      # - ./docs/openapi.json:/usr/share/nginx/html/openapi.json
+      - ./docs:/oas
+    environment:
+      SWAGGER_JSON: /oas/openapi.json
 
   db:
     image: postgres:16
@@ -27,6 +37,25 @@ services:
       - db
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/url_shortener
+    entrypoint:
+      [
+        'sh',
+        '-c',
+        'corepack enable && npx pnpm prisma migrate deploy && node dist/main',
+      ]
+
+  auth-service:
+    build:
+      context: ./apps/auth-service
+    ports:
+      - '3001:3001'
+    env_file:
+      - ./apps/auth-service/.env
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/auth
+      JWT_SECRET: C0sz9xfKzb+CTNQoq97pZUrmA4g5yCMatWT+/DShv2I=
     entrypoint:
       [
         'sh',

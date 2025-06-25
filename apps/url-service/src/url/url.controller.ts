@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   HttpStatus,
   NotFoundException,
   Param,
@@ -22,8 +23,7 @@ export class UrlController {
   constructor(private service: UrlService) {}
 
   @Post('shorten')
-  async shorten(@Body() body: CreateUrlDTO, @Req() req: Request) {
-    const userId = req.headers['x-user-id'] as string | undefined; // Krakend passes token payload via header
+  async shorten(@Headers('x-id') userId: string, @Body() body: CreateUrlDTO) {
     return this.service.shorten({
       originalUrl: body.originalUrl,
       userId,
@@ -42,11 +42,11 @@ export class UrlController {
 
   @Get('me/urls')
   async listUserUrls(
+    @Headers('x-id') userId: string,
     @Req() req: Request,
     @Query('page') page = '1',
     @Query('limit') limit = '10',
   ) {
-    const userId = req.headers['x-user-id'] as string;
     if (!userId) {
       throw new UnauthorizedException('User not authenticated');
     }
@@ -63,11 +63,10 @@ export class UrlController {
 
   @Patch('me/urls/:id')
   async updateUrl(
+    @Headers('x-id') userId: string,
     @Param('id') id: string,
     @Body() dto: UpdateUrlDto,
-    @Req() req: Request,
   ) {
-    const userId = req.headers['x-user-id'] as string;
     if (!userId) {
       throw new UnauthorizedException('User not authenticated');
     }
@@ -81,8 +80,7 @@ export class UrlController {
   }
 
   @Delete('me/urls/:id')
-  async deleteUrl(@Param('id') id: string, @Req() req: Request) {
-    const userId = req.headers['x-user-id'] as string;
+  async deleteUrl(@Headers('x-id') userId: string, @Param('id') id: string) {
     if (!userId) {
       throw new UnauthorizedException('User not authenticated');
     }
