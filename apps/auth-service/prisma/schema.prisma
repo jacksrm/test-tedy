@@ -12,19 +12,19 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["url_shortener"]
+  schemas  = ["auth"]
 }
 
-model Url {
-  id          String    @id @default(uuid())
-  originalUrl String
-  shortCode   String    @unique
-  clicks      Int       @default(0)
-  userId      String? // Nullable, for anonymous shortening
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime? // For soft delete
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  name      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
-  @@map("urls")
-  @@schema("url_shortener")
+  @@index([email])
+  @@map("users")
+  @@schema("auth")
 }

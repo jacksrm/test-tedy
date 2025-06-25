@@ -6,19 +6,6 @@
   "timeout": "30000ms",
   "endpoints": [
     {
-      "endpoint": "/auth/login",
-      "method": "POST",
-      "backend": [
-        {
-          "host": [
-            "http://auth-service:3001"
-          ],
-          "url_pattern": "/auth/login",
-          "method": "POST"
-        }
-      ]
-    },
-    {
       "endpoint": "/shorten",
       "method": "POST",
       "backend": [
@@ -57,20 +44,6 @@
     {
       "endpoint": "/me/urls",
       "method": "GET",
-      "extra_config": {
-        "auth/validator": {
-          "alg": "HS256",
-          "secret": "default-secret",
-          "disable_jwk_security": true,
-          "propagate_claims": true,
-          "headers": [
-            {
-              "name": "x-user-id",
-              "value": "{claim:id}"
-            }
-          ]
-        }
-      },
       "backend": [
         {
           "host": [

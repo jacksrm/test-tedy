@@ -1,34 +1,65 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  Headers,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserResponseDto } from './dto/user-response.dto';
+import { ErrorMessages } from '../error/messages';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
+    const result = await this.userService.create(createUserDto);
+
+    return new UserResponseDto(result);
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  async findAll(
+    @Query('page') page = '1',
+    @Query('limit') limit = '10',
+  ): Promise<UserResponseDto[]> {
+    return this.userService.findAll({ page: +page, limit: +limit });
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  @Get('me')
+  async findOne(@Headers('x-user-id') id: string): Promise<UserResponseDto> {
+    if (!id) throw new UnauthorizedException(ErrorMessages.UNAUTHORIZED_USER);
+
+    const result = await this.userService.findOne(id);
+    return new UserResponseDto(result);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @Patch('me')
+  async update(
+    @Headers('x-user-id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<UserResponseDto> {
+    if (!id) throw new UnauthorizedException(ErrorMessages.UNAUTHORIZED_USER);
+
+    const result = await this.userService.update(id, updateUserDto);
+
+    return new UserResponseDto(result);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  @Delete('me')
+  async remove(@Headers('x-user-id') id: string): Promise<UserResponseDto> {
+    if (!id) throw new UnauthorizedException(ErrorMessages.UNAUTHORIZED_USER);
+
+    const result = await this.userService.remove(id);
+    return new UserResponseDto(result);
   }
 }

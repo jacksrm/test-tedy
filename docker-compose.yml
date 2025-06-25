@@ -1,6 +1,6 @@
 services:
   krakend:
-    image: devopsfaith/krakend:2.4
+    image: devopsfaith/krakend-ce:2.4
     ports:
       - '8080:8080'
     volumes:
